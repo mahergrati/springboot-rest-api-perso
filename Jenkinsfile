@@ -115,7 +115,7 @@ pipeline {
 
         always {
             echo '🧹 Nettoyage du workspace...'
-            cleanWs()  // supprime les fichiers du workspace à la fin
+            // cleanWs()  // supprime les fichiers du workspace à la fin
         }
     }
 }

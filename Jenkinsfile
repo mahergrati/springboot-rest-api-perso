@@ -2,22 +2,19 @@ pipeline {
     agent any
 
     environment {
-        // 🔧 Variables globales
-        MAVEN_HOME = tool 'M2_HOME'                     // Maven configuré dans Jenkins
-        DOCKERHUB_USER = 'maher2002'                    // ton compte Docker Hub
-        IMAGE_NAME = 'springboot-rest-api'               // nom de ton image Docker
-        VERSION = "v${env.BUILD_NUMBER}"                 // version dynamique
+        MAVEN_HOME = tool 'M2_HOME'
+        DOCKERHUB_USER = 'maher2002'
+        IMAGE_NAME = 'springboot-rest-api'
+        VERSION = "v${env.BUILD_NUMBER}"
     }
 
     options {
-        // 🧹 Gestion de la file d’attente et nettoyage
-        buildDiscarder(logRotator(numToKeepStr: '10'))   // garder seulement 10 builds
-        timestamps()                                     // ajoute l'heure dans les logs
-        disableConcurrentBuilds()                        // empêche plusieurs builds simultanés
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+        disableConcurrentBuilds()
     }
 
     tools {
-        // 🛠️ Utilise le Maven installé dans Jenkins
         maven 'M2_HOME'
     }
 
@@ -44,7 +41,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml'  // 🔍 Afficher les rapports JUnit dans Jenkins
+                    junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
@@ -73,9 +70,23 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo '🚀 Déploiement de l’application...'
-                // Si tu veux exécuter le conteneur localement :
-                // sh "docker run -d -p 8080:8080 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
+                echo '🚀 Déploiement local du conteneur Docker...'
+                sh '''
+                    docker stop springboot-api || true
+                    docker rm springboot-api || true
+                    docker pull maher2002/springboot-rest-api:latest
+                    docker run -d -p 1235:8080 --name springboot-api maher2002/springboot-rest-api:latest
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo '🩺 Vérification du service...'
+                sh '''
+                    sleep 10
+                    curl -f http://localhost:1235/api/tutorials || (echo "❌ API non disponible !" && exit 1)
+                '''
             }
         }
     }
@@ -83,39 +94,13 @@ pipeline {
     post {
         success {
             echo '✅ Pipeline exécuté avec succès !'
-            emailext(
-                to: 'mohamedmaher.grati@gmail.com',
-                subject: "✅ Jenkins Build #${BUILD_NUMBER} réussi",
-                body: """
-                <h2>🎉 Build Jenkins réussi !</h2>
-                <p>Le projet <b>${IMAGE_NAME}</b> a été compilé, testé et déployé avec succès.</p>
-                <ul>
-                    <li><b>Version :</b> ${VERSION}</li>
-                    <li><b>Image Docker :</b> ${DOCKERHUB_USER}/${IMAGE_NAME}:${VERSION}</li>
-                    <li><b>Durée :</b> ${currentBuild.durationString}</li>
-                </ul>
-                """,
-                mimeType: 'text/html'
-            )
         }
-
         failure {
-            echo '❌ Échec du pipeline.'
-            emailext(
-                to: 'mohamedmaher.grati@gmail.com',
-                subject: "❌ Jenkins Build #${BUILD_NUMBER} échoué",
-                body: """
-                <h2>⚠️ Build Jenkins échoué !</h2>
-                <p>Le projet <b>${IMAGE_NAME}</b> a rencontré une erreur durant l’exécution.</p>
-                <p>Consultez les logs Jenkins pour plus d’informations.</p>
-                """,
-                mimeType: 'text/html'
-            )
+            echo '❌ Échec du pipeline. Consultez les logs Jenkins.'
         }
-
         always {
             echo '🧹 Nettoyage du workspace...'
-            // cleanWs()  // supprime les fichiers du workspace à la fin
+            cleanWs()
         }
     }
 }

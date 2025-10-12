@@ -100,7 +100,7 @@ pipeline {
         }
         always {
             echo '🧹 Nettoyage du workspace...'
-            cleanWs()
+           // cleanWs()
         }
     }
 }

@@ -46,6 +46,23 @@ pipeline {
             }
         }
 
+        // 🟦 Nouvelle étape ajoutée : Analyse SonarQube
+        stage('SonarQube Analysis') {
+            steps {
+                echo '🔍 Analyse du code avec SonarQube...'
+                withCredentials([string(credentialsId: 'jenkins-sonar', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${MAVEN_HOME}/bin/mvn sonar:sonar \
+                            -Dsonar.projectKey=springboot-rest-api \
+                            -Dsonar.host.url=http://192.168.33.10:9000 \
+                            -Dsonar.login=$SONAR_TOKEN
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo "🐳 Construction de l'image Docker : ${DOCKERHUB_USER}/${IMAGE_NAME}:${VERSION}"
@@ -100,7 +117,7 @@ pipeline {
         }
         always {
             echo '🧹 Nettoyage du workspace...'
-           // cleanWs()
+            // cleanWs()
         }
     }
 }

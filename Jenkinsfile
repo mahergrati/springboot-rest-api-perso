@@ -62,6 +62,15 @@ pipeline {
                 }
             }
         }
+        stage('Quality Gate') {
+             steps {
+                echo '🚦 Vérification du Quality Gate SonarQube...'
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
 
         stage('Build Docker Image') {
             steps {

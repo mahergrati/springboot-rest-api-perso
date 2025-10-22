@@ -39,12 +39,12 @@
     <repository>
       <id>nexus-releases</id>
       <name>Nexus Releases</name>
-      <url>http://192.168.33.10:9191/repository/maven-releases/</url>
+      <url>http://localhost:9191/repository/maven-releases/</url>
     </repository>
     <snapshotRepository>
       <id>nexus-snapshots</id>
       <name>Nexus Snapshots</name>
-      <url>http://192.168.33.10:9191/repository/maven-snapshots/</url>
+      <url>http://localhost:9191/repository/maven-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
 

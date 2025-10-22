@@ -70,6 +70,20 @@ pipeline {
                 }
             }
         }
+        stage('Publish to Nexus') {
+            steps {
+                echo '📦 Publication de l’artefact Maven dans Nexus...'
+                 withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh """
+                    ${MAVEN_HOME}/bin/mvn deploy \
+                    -DskipTests \
+                    -Dnexus.username=$NEXUS_USER \
+                    -Dnexus.password=$NEXUS_PASS
+                     """
+                }
+             }
+        }
+
 
 
         stage('Build Docker Image') {

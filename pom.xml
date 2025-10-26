@@ -36,17 +36,18 @@
   </dependencies>
 
   <distributionManagement>
-  <repository>
-    <id>nexus</id>
-    <name>nexus-releases</name>
-    <url>http://192.168.170.1:9191/repository/maven-releases/</url>
-  </repository>
-  <snapshotRepository>
-    <id>nexus</id>
-    <name>nexus-snapshot</name>
-    <url>http://192.168.170.1:9191/repository/maven-snapshots/</url>
-  </snapshotRepository>
+    <repository>
+        <id>nexus-releases</id>
+        <name>Nexus Releases</name>
+        <url>http://192.168.170.1:9191/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+        <id>nexus-snapshots</id>
+        <name>Nexus Snapshots</name>
+        <url>http://192.168.170.1:9191/repository/maven-snapshots/</url>
+    </snapshotRepository>
 </distributionManagement>
+
 
 
   <build>
